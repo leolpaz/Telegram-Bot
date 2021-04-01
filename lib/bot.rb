@@ -19,6 +19,7 @@ class Bot
         when '/start'
           @state = 0
           send_start(bot, client)
+          p send_start(bot, client)
         when '/pizza'
           @states[client.chat.id] = 1
           pizza_option(bot, client)
@@ -50,7 +51,6 @@ class Bot
   def store_order(bot, client, order, id)
     order = order.to_i
     @orders[id] = order
-    p order 
     case order
     when 1
       bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
@@ -65,6 +65,10 @@ class Bot
       bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
       @states[client.chat.id] = 3
     end
+  end
+
+  def finish_order(bot, client, id)
+    bot.api.send_message(chat_id: client.chat.id, text: " You bought a #{@pizzas[@orders[id]]['name']}\r\n The price is #{@pizzas[@orders[id]]['price']} to be delivered at #{@adress[id]}\r\n Thanks for buying with pizzabot")
   end
 
 
@@ -82,7 +86,6 @@ class Bot
 
   def get_adress(adress, id)
     @adress[id] = adress
-    p @adress[id]
   end
 
 end
