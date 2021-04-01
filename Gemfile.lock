@@ -35,10 +35,11 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   net-http-persistent (~> 4.0, >= 4.0.1)
   telegram-bot-ruby
 
 BUNDLED WITH
-   2.1.4
+   2.2.3
