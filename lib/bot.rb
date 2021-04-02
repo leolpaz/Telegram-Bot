@@ -1,13 +1,16 @@
 require 'telegram/bot'
 require_relative 'cart'
 
+# rubocop: disable Metrics/CyclomaticComplexity, Metrics/LineLength, Metrics/MethodLength, Metrics/AbcSize
+
 class Bot
   def initialize
     @state = 0
     @states = {}
     @orders = {}
     @adress = {}
-    @pizzas = { 1 => { 'name' => 'Cheese Pizza', 'price' => '8' },
+    @carts = {}
+    @pizzas = { 1 => { 'name' => 'Cheese Pizza', 'price' => 8 },
                 2 => { 'name' => 'Cheese and Ham Pizza', 'price' => 10 }, 3 => { 'name' => 'Meat Pizza', 'price' => 15 }, 4 => { 'name' => 'Cream Cheese and Chicken Pizza', 'price' => 20 } }
     bot_logic
   end
@@ -24,16 +27,19 @@ class Bot
     bot.api.send_message(chat_id: client.chat.id, text: pizza_text)
   end
 
-  def store_order(bot, client, order, id)
-    @new_cart = Cart.new(client.chat.id)
+  def store_order(_bot, client, order, id)
+    @carts[id] = Cart.new(id) if @carts[id].nil?
     order = order.to_i
     @orders[id] = order
     @states[client.chat.id] = 3
   end
 
   def finish_order(bot, client, id)
+    names = @carts[id].name_to_string(id)
+    total = @carts[id].cart_total(id)
     bot.api.send_message(chat_id: client.chat.id,
-                         text: " You bought a #{@pizzas[@orders[id]]['name']}\r\n The price is R$#{@pizzas[@orders[id]]['price']} to be delivered at #{@adress[id]}\r\n Thanks for buying with pizzabot")
+                         text: "You bought #{names}\r\nFor the total of R$#{total}\r\nTo the adress: #{@adress[id]}\r\nThanks for shopping with PizzaBot")
+    pizza_stop(bot, client, id)
   end
 
   def bot_logic
@@ -48,15 +54,20 @@ class Bot
           @states[client.chat.id] = 0
           send_start(bot, client)
         when '/pizza'
-          @states[client.chat.id] = 1
-          ask_adress(bot, client, client.chat.id)
+          pizza_listen(bot, client, client.chat.id)
         when '/stop'
-          @states[client.chat.id] = 0
-          pizza_stop(bot, client, client.chat.id)
+          stop_listen(bot, client, client.chat.id)
         when '/confirm'
-          
+          confirm_listen(bot, client, client.chat.id)
         when '/back'
           if @states[client.chat.id] == 2 or @states[client.chat.id] == 3
+            @states[client.chat.id] = 2
+            check_state(bot, client, client.chat.id, client.text)
+          end
+        when '/finish'
+          finish_order(bot, client, client.chat.id) if @states[client.chat.id] == 4
+        when '/again'
+          if @states[client.chat.id] == 4
             @states[client.chat.id] = 2
             check_state(bot, client, client.chat.id, client.text)
           end
@@ -67,10 +78,33 @@ class Bot
     end
   end
 
+  def pizza_listen(bot, client, id)
+    @states[id] = 1
+    ask_adress(bot, client, id)
+  end
+
+  def stop_listen(bot, client, id)
+    @states[id] = 0
+    pizza_stop(bot, client, id)
+  end
+
+  def confirm_listen(bot, client, id)
+    add_to_cart(bot, client, client.chat.id)
+    finish(bot, client, id)
+  end
+
+  def finish(bot, client, id)
+    @states[id] = 4
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: 'Type /finish to finish your order, or /again to order another pizza')
+  end
+
   def pizza_stop(bot, client, id)
     @adress[id] = nil
     @orders[id] = nil
-    bot.api.send_message(chat_id: client.chat.id, text: "Thanks for talking with pizzabot, if you'd like to start again, press /start")
+    @carts[id] = nil
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: "Thanks for talking with pizzabot, if you'd like to start again, press /start")
   end
 
   def check_state(bot, client, id, text)
@@ -87,24 +121,31 @@ class Bot
     end
   end
 
+  def add_to_cart(_bot, _client, id)
+    @carts[id].push_to_cart(id, @pizzas[@orders[id]]['name'], @pizzas[@orders[id]]['price'])
+  end
+
   def check_pizza(pizza)
     pizza = pizza.to_i
     @pizzas.key?(pizza) || false
   end
 
   def confirm_order(bot, client, id)
-    bot.api.send_message(chat_id: client.chat.id, text: "Please type /confirm to confirm your order of a #{@pizzas[@orders[id]]['name']} for R$#{@pizzas[@orders[id]]['price']} or /back to go back")
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: "Please type /confirm to confirm your order of a #{@pizzas[@orders[id]]['name']} for R$#{@pizzas[@orders[id]]['price']} or /back to go back")
   end
 
   def pizza_text(input)
     "#{@pizzas[input]['name']} for R$#{@pizzas[input]['price']}"
   end
 
-  def ask_adress(bot, client, id)
-    bot.api.send_message(chat_id: client.chat.id, text: "Please type in your adress")
+  def ask_adress(bot, client, _id)
+    bot.api.send_message(chat_id: client.chat.id, text: 'Please type in your adress')
   end
 
   def get_adress(adress, id)
     @adress[id] = adress
   end
 end
+
+# rubocop: enable Metrics/CyclomaticComplexity, Metrics/LineLength, Metrics/MethodLength, Metrics/AbcSize
