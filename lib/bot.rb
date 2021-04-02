@@ -43,6 +43,7 @@ class Bot
         @states[client.chat.id] = 0 unless @states[client.chat.id]
         @first = client.from.first_name
         @last = client.from.last_name
+        @new_cart = Cart.new(client.chat.id)
         case client.text
         when '/start'
           @states[client.chat.id] = 0
