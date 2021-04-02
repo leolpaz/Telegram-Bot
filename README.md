@@ -4,7 +4,7 @@
 
 # Build a Bot
 
-On this project I built a telegram bot that allows you to order pizzas use /start to start
+On this project I built a telegram bot that mimics the process to order pizzas use /start to start
 
 ![screenshot1](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(1).png)
 
