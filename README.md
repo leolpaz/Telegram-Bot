@@ -6,19 +6,19 @@
 
 On this project I built a telegram bot that allows you to order pizzas use /start to start
 
-![screenshot1](assets/screenshot(1).png)
+![screenshot1](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(1).png)
 
-![screenshot2](assets/screenshot(2).png)
+![screenshot2](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(2).png)
 
-![screenshot3](assets/screenshot(3).png)
+![screenshot3](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(3).png)
 
-![screenshot4](assets/screenshot(4).png)
+![screenshot4](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(4).png)
 
-![screenshot5](assets/screenshot(5).png)
+![screenshot5](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(5).png)
 
-![screenshot6](assets/screenshot(6).png)
+![screenshot6](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(6).png)
 
-![screenshot7](assets/screenshot(7).png)
+![screenshot7](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(7).png)
 
 ## Setup
 
@@ -39,7 +39,7 @@ On this project I built a telegram bot that allows you to order pizzas use /star
 
 If you see this:
 
-![screenshot8](assets/screenshot(8).png)
+![screenshot8](https://github.com/leolpaz/Telegram-Bot/blob/features/assets/screenshot%20(8).png)
 
 It means that everything is working as intended.
 
