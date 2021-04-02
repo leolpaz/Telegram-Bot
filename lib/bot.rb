@@ -43,7 +43,7 @@ class Bot
   end
 
   def bot_logic
-    token = '1738560528:AAGEZPyiMmEb9ov6yiumgqLdXXQKoWUjCBQ'
+    token = 'token'
     Telegram::Bot::Client.run(token) do |bot|
       bot.listen do |client|
         @states[client.chat.id] = 0 unless @states[client.chat.id]
