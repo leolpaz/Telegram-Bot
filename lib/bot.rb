@@ -1,4 +1,5 @@
 require 'telegram/bot'
+require_relative 'cart'
 
 class Bot
   def initialize
@@ -24,10 +25,9 @@ class Bot
   end
 
   def store_order(bot, client, order, id)
+    @new_cart = Cart.new(client.chat.id)
     order = order.to_i
     @orders[id] = order
-    bot.api.send_message(chat_id: client.chat.id,
-                         text: "You just choose a delicious #{pizza_text(@orders[id])} please give us your adress")
     @states[client.chat.id] = 3
   end
 
@@ -43,14 +43,23 @@ class Bot
         @states[client.chat.id] = 0 unless @states[client.chat.id]
         @first = client.from.first_name
         @last = client.from.last_name
-        @new_cart = Cart.new(client.chat.id)
         case client.text
         when '/start'
           @states[client.chat.id] = 0
           send_start(bot, client)
         when '/pizza'
           @states[client.chat.id] = 1
-          pizza_option(bot, client)
+          ask_adress(bot, client, client.chat.id)
+        when '/stop'
+          @states[client.chat.id] = 0
+          pizza_stop(bot, client, client.chat.id)
+        when '/confirm'
+          
+        when '/back'
+          if @states[client.chat.id] == 2 or @states[client.chat.id] == 3
+            @states[client.chat.id] = 2
+            check_state(bot, client, client.chat.id, client.text)
+          end
         else
           check_state(bot, client, client.chat.id, client.text)
         end
@@ -58,15 +67,23 @@ class Bot
     end
   end
 
+  def pizza_stop(bot, client, id)
+    @adress[id] = nil
+    @orders[id] = nil
+    bot.api.send_message(chat_id: client.chat.id, text: "Thanks for talking with pizzabot, if you'd like to start again, press /start")
+  end
+
   def check_state(bot, client, id, text)
-    if (@states[id] == 1) && (check_pizza(text) == false)
-      pizza_option(bot, client)
-    elsif @states[id] == 1
+    if @states[id] == 1
       @states[id] = 2
-      store_order(bot, client, text, id)
-    elsif @states[id] == 3
       get_adress(text, id)
-      finish_order(bot, client, id)
+      pizza_option(bot, client)
+    elsif (@states[id] == 2) && (check_pizza(text) == false)
+      pizza_option(bot, client)
+    elsif @states[id] == 2
+      @states[id] = 3
+      store_order(bot, client, text, id)
+      confirm_order(bot, client, id)
     end
   end
 
@@ -75,8 +92,16 @@ class Bot
     @pizzas.key?(pizza) || false
   end
 
+  def confirm_order(bot, client, id)
+    bot.api.send_message(chat_id: client.chat.id, text: "Please type /confirm to confirm your order of a #{@pizzas[@orders[id]]['name']} for R$#{@pizzas[@orders[id]]['price']} or /back to go back")
+  end
+
   def pizza_text(input)
     "#{@pizzas[input]['name']} for R$#{@pizzas[input]['price']}"
+  end
+
+  def ask_adress(bot, client, id)
+    bot.api.send_message(chat_id: client.chat.id, text: "Please type in your adress")
   end
 
   def get_adress(adress, id)
