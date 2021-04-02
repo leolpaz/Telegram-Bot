@@ -1,91 +1,84 @@
 require 'telegram/bot'
 
-
 class Bot
-
-    def initialize
-      @state = 0
-      @states = {}
-      @orders = {}
-      @adress = {}
-      @pizzas = {1 => {'name' => 'Cheese Pizza', 'price' => '8'}, 2 => {'name' => 'Cheese and Ham Pizza', 'price' => 10}, 3 => {'name' => 'Meat Pizza', 'price' => 15}, 4 => {'name' => 'Cream Cheese and Chicker Pizza', 'price' => 20}}
-
-    Telegram::Bot::Client.run(@@token) do |bot|
-      bot.listen do |client|
-        @states[client.chat.id] = 0 unless @states[client.chat.id]
-        @@first = client.from.first_name
-        @@last = client.from.last_name
-        case client.text
-        when '/start'
-          @state = 0
-          send_start(bot, client)
-          p send_start(bot, client)
-        when '/pizza'
-          @states[client.chat.id] = 1
-          pizza_option(bot, client)
-        else
-          if @states[client.chat.id] == 1 and check_pizza(client.text) == false
-            pizza_option(bot, client)
-          elsif @states[client.chat.id] == 1
-            @states[client.chat.id] = 2
-            store_order(bot, client, client.text, client.chat.id)
-          elsif @states[client.chat.id] == 3
-            get_adress(client.text, client.chat.id)
-            finish_order(bot, client, client.chat.id)
-          end
-        end
-      end
-    end
+  def initialize
+    @state = 0
+    @states = {}
+    @orders = {}
+    @adress = {}
+    @pizzas = { 1 => { 'name' => 'Cheese Pizza', 'price' => '8' },
+                2 => { 'name' => 'Cheese and Ham Pizza', 'price' => 10 }, 3 => { 'name' => 'Meat Pizza', 'price' => 15 }, 4 => { 'name' => 'Cream Cheese and Chicken Pizza', 'price' => 20 } }
+    bot_logic
   end
 
+  private
+
   def send_start(bot, client)
-    initial_text = 'Hello'
-    bot.api.send_message(chat_id: client.chat.id, text: "Hello #{@@first} #{@@last}, welcome to my pizza bot, can I take your order? type /pizza to start or /stop to stop")
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: "Hello #{@first} #{@last}, welcome to my pizza bot, can I take your order? type /pizza to start or /stop to stop")
   end
 
   def pizza_option(bot, client)
-    pizza_text = "Hi, your options are: \r\n 1 - #{@pizzas[1]['name']} for R$#{@pizzas[1]['price']} \r\n 2 - #{@pizzas[2]['name']} for R$#{@pizzas[2]['price']} \r\n 3 - #{@pizzas[3]['name']} for R$#{@pizzas[3]['price']} \r\n 4 - #{@pizzas[4]['name']} for R$#{@pizzas[4]['price']}, \r\n type the number of the pizza that you want to proceed."
+    pizza_text = "Hi, your options are: \r\n 1 - #{pizza_text(1)} \r\n 2 - #{pizza_text(2)} \r\n 3 - #{pizza_text(3)} \r\n 4 - #{pizza_text(4)}, \r\n type the number of the pizza that you want to proceed."
     bot.api.send_message(chat_id: client.chat.id, text: pizza_text)
   end
 
   def store_order(bot, client, order, id)
     order = order.to_i
     @orders[id] = order
-    case order
-    when 1
-      bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
-      @states[client.chat.id] = 3
-    when 2
-      bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
-      @states[client.chat.id] = 3
-    when 3
-      bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
-      @states[client.chat.id] = 3
-    when 4
-      bot.api.send_message(chat_id: client.chat.id, text: "You just choose a delicious #{@pizzas[order]['name']} for R$#{@pizzas[order]['price']} please give us your adress")
-      @states[client.chat.id] = 3
-    end
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: "You just choose a delicious #{pizza_text(@orders[id])} please give us your adress")
+    @states[client.chat.id] = 3
   end
 
   def finish_order(bot, client, id)
-    bot.api.send_message(chat_id: client.chat.id, text: " You bought a #{@pizzas[@orders[id]]['name']}\r\n The price is #{@pizzas[@orders[id]]['price']} to be delivered at #{@adress[id]}\r\n Thanks for buying with pizzabot")
+    bot.api.send_message(chat_id: client.chat.id,
+                         text: " You bought a #{@pizzas[@orders[id]]['name']}\r\n The price is R$#{@pizzas[@orders[id]]['price']} to be delivered at #{@adress[id]}\r\n Thanks for buying with pizzabot")
   end
 
+  def bot_logic
+    token = '1738560528:AAGEZPyiMmEb9ov6yiumgqLdXXQKoWUjCBQ'
+    Telegram::Bot::Client.run(token) do |bot|
+      bot.listen do |client|
+        @states[client.chat.id] = 0 unless @states[client.chat.id]
+        @first = client.from.first_name
+        @last = client.from.last_name
+        case client.text
+        when '/start'
+          @states[client.chat.id] = 0
+          send_start(bot, client)
+        when '/pizza'
+          @states[client.chat.id] = 1
+          pizza_option(bot, client)
+        else
+          check_state(bot, client, client.chat.id, client.text)
+        end
+      end
+    end
+  end
 
-  private
-  @@token = '1738560528:AAGEZPyiMmEb9ov6yiumgqLdXXQKoWUjCBQ'
+  def check_state(bot, client, id, text)
+    if (@states[id] == 1) && (check_pizza(text) == false)
+      pizza_option(bot, client)
+    elsif @states[id] == 1
+      @states[id] = 2
+      store_order(bot, client, text, id)
+    elsif @states[id] == 3
+      get_adress(text, id)
+      finish_order(bot, client, id)
+    end
+  end
 
   def check_pizza(pizza)
     pizza = pizza.to_i
-    if @pizzas.key?(pizza)
-      @pizzas.key?(pizza)
-    else
-      false
-    end
+    @pizzas.key?(pizza) || false
+  end
+
+  def pizza_text(input)
+    "#{@pizzas[input]['name']} for R$#{@pizzas[input]['price']}"
   end
 
   def get_adress(adress, id)
     @adress[id] = adress
   end
-
 end
