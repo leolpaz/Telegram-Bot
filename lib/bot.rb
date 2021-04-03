@@ -151,4 +151,3 @@ class Bot
 end
 
 # rubocop: enable Metrics/CyclomaticComplexity, Metrics/LineLength, Metrics/MethodLength, Metrics/AbcSize
-

@@ -1,5 +1,5 @@
 class Cart
-  attr_reader :client_id, :carts #uncomment attr_reader for rspec test
+  # attr_reader :client_id, :carts # uncomment attr_reader for rspec test
 
   def initialize(client_id)
     @client_id = client_id.to_i
