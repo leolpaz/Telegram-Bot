@@ -1,5 +1,7 @@
 require 'telegram/bot'
 require_relative 'cart'
+require 'dotenv'
+Dotenv.load('./lib/token.env')
 
 # rubocop: disable Metrics/CyclomaticComplexity, Metrics/LineLength, Metrics/MethodLength, Metrics/AbcSize
 
@@ -43,8 +45,8 @@ class Bot
   end
 
   def bot_logic
-    token = 'token'
-    Telegram::Bot::Client.run(token) do |bot|
+    @token = ENV['MY_TOKEN']
+    Telegram::Bot::Client.run(@token) do |bot|
       bot.listen do |client|
         @states[client.chat.id] = 0 unless @states[client.chat.id]
         @first = client.from.first_name
@@ -149,3 +151,4 @@ class Bot
 end
 
 # rubocop: enable Metrics/CyclomaticComplexity, Metrics/LineLength, Metrics/MethodLength, Metrics/AbcSize
+
