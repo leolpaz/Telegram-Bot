@@ -1,4 +1,5 @@
 require_relative '../lib/cart'
+require_relative '../lib/bot'
 
 test1 = Cart.new(123)
 test2 = Cart.new(245)
@@ -17,7 +18,7 @@ describe Cart do
   test2.push_to_cart(245, 'grape soda', '5')
   describe '#initialize' do
     it 'should be an instance of a Cart object' do
-      test1.should be_an_instance_of Cart
+      expect(test1).to be_an_instance_of Cart
     end
     it 'should raise an error if started without a parameter' do
       expect { Cart.new }.to raise_error(ArgumentError)
