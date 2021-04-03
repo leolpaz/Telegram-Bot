@@ -1,5 +1,5 @@
 require_relative '../lib/cart'
-require_relative '../lib/bot'
+
 
 test1 = Cart.new(123)
 test2 = Cart.new(245)
