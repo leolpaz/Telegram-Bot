@@ -36,7 +36,6 @@ On this project I built a telegram bot that mimics the process to order pizzas u
 
 ## Testing
 
-- Uncomment the attr_reader on cart.rb
 - Run the Setup up to "cd path/to/telegram-bot", skipping steps you already completed
 - Run on the terminal: ruby rspec spec/bot_spec.rb
 
