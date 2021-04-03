@@ -16,11 +16,11 @@ describe Cart do
   test2.push_to_cart(245, 'orange soda', '4')
   test2.push_to_cart(245, 'grape soda', '5')
   describe '#initialize' do
-    it "should be an instance of a Cart object" do
+    it 'should be an instance of a Cart object' do
       test1.should be_an_instance_of Cart
     end
-    it "should raise an error if started without a parameter" do
-      expect{ Cart.new }.to raise_error(ArgumentError)
+    it 'should raise an error if started without a parameter' do
+      expect { Cart.new }.to raise_error(ArgumentError)
     end
   end
   describe '#push_to_cart' do
