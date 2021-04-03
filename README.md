@@ -28,8 +28,10 @@ On this project I built a telegram bot that mimics the process to order pizzas u
 - Run git clone (link of this repository).
 - Install Ruby, google is going to have information about how to install it on your OS.
 - cd path/to/telegram-bot
-- Replace the string 'token' in line 46 of /../lib/bot.rb with your own token
+- Replace the string 'token' in line 46 of /../lib/bot.rb with your own token, you can get one at the [BotFather bot](https://t.me/botfather)
 - Run on the terminal: ruby bin/main.rb
+- Use the link given by the botfather
+- Search for the name you gave your bot on telegram, on my case it was @pizzamvcapstone_bot
 - Talk to the telegram bot 
 
 ## Testing
