@@ -63,7 +63,7 @@ It means that everything is working as intended.
 ## Acknowledgments
 
 - [Microverse](https://www.microverse.org)
-- The staff behing Telegram Bot API
+- The staff behind Telegram Bot API
 - My standup team
 
 ## License
